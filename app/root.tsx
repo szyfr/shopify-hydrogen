@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  useMatches,
 } from 'react-router';
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
@@ -19,6 +20,12 @@ import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
+
+/**
+ * Opt-in metadata a route can export as `handle` to change how the root
+ * renders it. Currently only `chrome`, which when false skips `PageLayout`.
+ */
+export type RouteHandle = {chrome?: boolean};
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -167,6 +174,14 @@ export function Layout({children}: {children?: React.ReactNode}) {
 
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
+  const matches = useMatches();
+
+  // Routes may opt out of the standard storefront chrome (header, footer,
+  // asides) by exporting `handle = {chrome: false}`. The funnel supplies its
+  // own header and footer, so it renders bare.
+  const withChrome = !matches.some(
+    (match) => (match.handle as RouteHandle | undefined)?.chrome === false,
+  );
 
   if (!data) {
     return <Outlet />;
@@ -178,9 +193,13 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      <PageLayout {...data}>
+      {withChrome ? (
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+      ) : (
         <Outlet />
-      </PageLayout>
+      )}
     </Analytics.Provider>
   );
 }
