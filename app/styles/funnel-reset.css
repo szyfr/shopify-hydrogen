@@ -1,0 +1,93 @@
+/**
+ * Funnel neutralization layer.
+ *
+ * `app/styles/reset.css` and `app/styles/app.css` are linked globally from
+ * root.tsx and style bare element selectors (`section`, `h1`, `h2`, `p`, `a`,
+ * `ul`, `li`, `input`, `fieldset`, `form`, `img`, ...). The funnel is built
+ * almost entirely from those elements, so without this every ported component
+ * inherits skeleton spacing, borders and colors.
+ *
+ * Every rule here is `.funnel-root <element>` (specificity 0,1,1), which
+ * outranks the bare element selectors (0,0,1) regardless of load order. This
+ * only ever *removes* skeleton styling — the Tailwind utilities on the ported
+ * components then supply the real design.
+ *
+ * Loaded via the funnel route's `links()` export, so stock routes never see it.
+ */
+
+.funnel-root h1,
+.funnel-root h2,
+.funnel-root h3,
+.funnel-root h4,
+.funnel-root h5,
+.funnel-root h6,
+.funnel-root p {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.funnel-root section {
+  padding: 0;
+}
+
+.funnel-root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.funnel-root a:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.funnel-root img {
+  border-radius: 0;
+}
+
+.funnel-root ul,
+.funnel-root ol,
+.funnel-root li,
+.funnel-root dl {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.funnel-root fieldset,
+.funnel-root form {
+  display: initial;
+  flex-direction: initial;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+
+.funnel-root input,
+.funnel-root textarea {
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.funnel-root legend {
+  font-weight: inherit;
+  margin: 0;
+}
+
+.funnel-root hr {
+  margin: 0;
+  border: 0;
+}
+
+.funnel-root code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-family: inherit;
+}

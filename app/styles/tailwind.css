@@ -4,3 +4,226 @@
  */
 
 @import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+ * Fonts
+ *
+ * Self-hosted rather than loaded from fonts.googleapis.com, so the strict
+ * nonce-based CSP in entry.server.tsx needs no extra style-src/font-src
+ * origins. `assetsInlineLimit: 0` in vite.config.ts keeps these as files
+ * rather than base64, which would otherwise require `data:` in font-src.
+ * Latin subset only, matching the source's `subsets: ["latin"]`.
+ * ------------------------------------------------------------------------ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/inter-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/montserrat-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---------------------------------------------------------------------------
+ * Design tokens (ported from the Next.js storefront's globals.css)
+ *
+ * `@theme` only *defines* variables and generates utility classes; it applies
+ * nothing on its own, so these are inert for the stock skeleton routes. The
+ * values that would actually repaint a page (`:root` custom properties and the
+ * base layer) are scoped to `.funnel-root` further down instead.
+ * ------------------------------------------------------------------------ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --radius-xs: 4px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+}
+
+/* Universal Statues brand — decorative + status colors, elevation.
+   These sit outside the light/dark-swappable slots above because the
+   storefront never runs a dark theme. */
+@theme {
+  --color-off-white: #f3f6fa;
+  --color-off-black: #1b2230;
+  --color-primary-hover: #0d2c5c;
+  --color-primary-20: rgba(18, 58, 120, 0.2);
+  --color-primary-10: rgba(18, 58, 120, 0.1);
+  --color-text-subtle: rgba(27, 34, 48, 0.5);
+  --color-text-disabled: rgba(27, 34, 48, 0.3);
+  --color-border-medium: rgba(27, 34, 48, 0.2);
+  --color-border-strong: rgba(27, 34, 48, 0.4);
+  --color-surface-overlay: rgba(27, 34, 48, 0.08);
+  --color-warning: #ef5f00;
+  --color-clay: #a67c52;
+  --color-clay-hover: #8d6946;
+  --color-success: #2b9a66;
+  --color-info: #3358d4;
+  --color-badge-primary-bg: rgba(18, 58, 120, 0.2);
+  --color-badge-error-bg: rgba(220, 59, 93, 0.15);
+  --color-badge-success-bg: rgba(43, 154, 102, 0.15);
+  --color-badge-warning-bg: rgba(239, 95, 0, 0.12);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(27, 34, 48, 0.06);
+  --shadow-dropdown: 0 4px 16px rgba(27, 34, 48, 0.12),
+    0 0 0 1px rgba(27, 34, 48, 0.08);
+
+  /* The source got these from `@import "shadcn/tailwind.css"`, which is not
+     carried over. `ui/accordion.tsx` is the only consumer. */
+  --animate-accordion-down: accordion-down 200ms ease-out;
+  --animate-accordion-up: accordion-up 200ms ease-out;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--accordion-panel-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--accordion-panel-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Funnel theme scope
+ *
+ * The source declared these on `:root` and styled `body` in `@layer base`.
+ * Doing that here would repaint every stock skeleton route, so the variables
+ * and the base styling are bound to `.funnel-root` instead. The funnel route
+ * renders `<div className="funnel-root">` as its outermost element.
+ * ------------------------------------------------------------------------ */
+
+.funnel-root {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+
+  --background: #f3f6fa;
+  --foreground: #1b2230;
+  --card: #ffffff;
+  --card-foreground: #1b2230;
+  --popover: #ffffff;
+  --popover-foreground: #1b2230;
+  --primary: #123a78;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f6fa;
+  --secondary-foreground: #1b2230;
+  --muted: #f3f6fa;
+  --muted-foreground: rgba(27, 34, 48, 0.7);
+  --accent: #f3f6fa;
+  --accent-foreground: #1b2230;
+  --destructive: #dc3b5d;
+  --border: rgba(27, 34, 48, 0.1);
+  --input: rgba(27, 34, 48, 0.2);
+  --ring: rgba(18, 58, 120, 0.35);
+  --radius: 8px;
+
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The source's `@layer base { * { @apply border-border } }`, scoped. */
+.funnel-root *,
+.funnel-root *::before,
+.funnel-root *::after {
+  border-color: var(--border);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Delivery-network map: animated freight "flow" along the arcs and pulsing
+ * halo rings around the hub and destination pins.
+ *
+ * The source applied these via inline `style` attributes. A nonce-based CSP
+ * does not cover `style=` attributes (CSP3 routes those through
+ * style-src-attr, which falls back to a nonce-only style-src and blocks
+ * them), so they are classes here instead.
+ * ------------------------------------------------------------------------ */
+
+@keyframes us-flow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+@keyframes us-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+.us-arc {
+  animation: us-flow 1.4s linear infinite;
+}
+
+/* `transform-box: fill-box` makes `transform-origin: center` resolve against
+   the element's own bounding box, which removes the need for the per-element
+   computed transformOrigin the source calculated in JS. */
+.us-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: us-pulse 2.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .us-arc,
+  .us-pulse {
+    animation: none;
+  }
+}
